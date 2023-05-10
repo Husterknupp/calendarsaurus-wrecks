@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/calendarsaurus-wrecks/static/css/main.b39f6446.css",
+    "main.js": "/calendarsaurus-wrecks/static/js/main.2c57ab8a.js",
+    "static/js/787.97eb67bb.chunk.js": "/calendarsaurus-wrecks/static/js/787.97eb67bb.chunk.js",
+    "index.html": "/calendarsaurus-wrecks/index.html",
+    "main.b39f6446.css.map": "/calendarsaurus-wrecks/static/css/main.b39f6446.css.map",
+    "main.2c57ab8a.js.map": "/calendarsaurus-wrecks/static/js/main.2c57ab8a.js.map",
+    "787.97eb67bb.chunk.js.map": "/calendarsaurus-wrecks/static/js/787.97eb67bb.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b39f6446.css",
+    "static/js/main.2c57ab8a.js"
+  ]
+}
