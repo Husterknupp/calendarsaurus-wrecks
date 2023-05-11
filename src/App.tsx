@@ -45,7 +45,7 @@ type Message = {
 };
 
 async function getMessages(): Promise<Message[]> {
-  const encrypted = await axios.get("/messages-encrypted.txt");
+  const encrypted = await axios.get("messages-encrypted.txt");
   // todo password to be entered instead
   const bytes = CryptoJS.AES.decrypt(encrypted.data, "secret key 123");
   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8)).data; // JSON standard allows the toplevel to be only objects
