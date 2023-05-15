@@ -1,4 +1,5 @@
 messages.json
+public/messages-encrypted.txt
 
 # dependencies
 /node_modules
