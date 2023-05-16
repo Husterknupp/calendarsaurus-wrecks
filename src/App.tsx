@@ -2,7 +2,6 @@ import React, { ReactElement, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import LOCALE_DE from "dayjs/locale/de";
-import axios from "axios";
 
 function App() {
   return (
@@ -40,19 +39,45 @@ function DateCpt(): ReactElement {
   );
 }
 
+async function httpGet<T>(url: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const req = new XMLHttpRequest();
+    req.open("GET", url);
+    req.onload = function () {
+      if (this.status.toString().startsWith("2")) {
+        resolve(this.response);
+      } else {
+        reject(`${this.status}: ${this.statusText}`);
+      }
+    };
+    req.send();
+  });
+}
+//
+// type Message = {
+//   date: string; // 2023-05-11
+//   message: string;
+// };
+
+const TIME_1MIN = 60000;
+
 function MessageCpt(): ReactElement | null {
   const [messages, setMessages] = useState<string>();
+
   useEffect(() => {
-    try {
-      axios
-        .get("messages-encrypted.txt")
-        .then((result) => setMessages(result.data));
-    } catch (e) {
-      alert(e);
+    function doRequest() {
+      httpGet<string>("messages-encrypted.txt").then(setMessages).catch(alert);
     }
+
+    doRequest();
+
+    const id = setInterval(doRequest, TIME_1MIN);
+    return () => clearInterval(id);
   }, []);
 
-  return <div className={"today-info"}>{messages}</div>;
+  return messages ? (
+    <div className={"today-info"}>{messages?.slice(0, 23) + "..."}</div>
+  ) : null;
 }
 
 export default App;
