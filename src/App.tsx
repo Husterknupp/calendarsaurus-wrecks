@@ -1,5 +1,7 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import "./App.css";
+import dayjs from "dayjs";
+import LOCALE_DE from "dayjs/locale/de";
 
 function App() {
   return (
@@ -17,11 +19,11 @@ function App() {
 const TIME_1SEC = 1000;
 
 function DateCpt(): ReactElement {
-  const [date, setDate] = useState(new Date().toString());
+  const [date, setDate] = useState(dayjs());
 
   useEffect(() => {
     function refreshDate() {
-      setDate(new Date().toString());
+      setDate(dayjs());
     }
     const id = setInterval(refreshDate, TIME_1SEC);
     return () => clearInterval(id);
@@ -29,8 +31,12 @@ function DateCpt(): ReactElement {
 
   return (
     <>
-      <h1 className={"weekday"}>Montag</h1>
-      <div className={"date"}>{date}</div>
+      <h1 className={"weekday"}>
+        {date.locale(LOCALE_DE.name).format("dddd")}
+      </h1>
+      <div className={"date"}>
+        {date.locale(LOCALE_DE.name).format("D. MMM YYYY")}
+      </div>
     </>
   );
 }
