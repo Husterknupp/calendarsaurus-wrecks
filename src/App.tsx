@@ -2,15 +2,14 @@ import React, { ReactElement, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import LOCALE_DE from "dayjs/locale/de";
+import axios from "axios";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <DateCpt />
-        <div className={"today-info"}>
-          Heute kein Mittagessen - wir holen dich 11:30 Uhr bei dir Zuhause ab.
-        </div>
+        <MessageCpt />
       </header>
     </div>
   );
@@ -39,6 +38,21 @@ function DateCpt(): ReactElement {
       </div>
     </>
   );
+}
+
+function MessageCpt(): ReactElement | null {
+  const [messages, setMessages] = useState<string>();
+  useEffect(() => {
+    try {
+      axios
+        .get("messages-encrypted.txt")
+        .then((result) => setMessages(result.data));
+    } catch (e) {
+      alert(e);
+    }
+  }, []);
+
+  return <div className={"today-info"}>{messages}</div>;
 }
 
 export default App;
