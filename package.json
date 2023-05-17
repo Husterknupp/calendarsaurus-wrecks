@@ -23,7 +23,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "node encrypt-messages.js && react-scripts build",
+    "encryption": "node encrypt-messages.js",
+    "build": "react-scripts build && node encrypt-messages.js",
     "test": "react-scripts test",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",

@@ -45,10 +45,10 @@ async function httpGet<T>(url: string): Promise<T> {
     const req = new XMLHttpRequest();
     req.open("GET", url);
 
-    // Default Accept header value is `text/html` and the proxy doesn't forward those requests (see https://create-react-app.dev/docs/proxying-api-requests-in-development/)
-    // That is a problem because I can't use the same url in development and in production
+    // Default Accept header value is `text/html` and the proxy doesn't forward those requests (see https://create-react-app.dev/docs/proxying-api-requests-in-development/).
+    // That is a problem because I can't use the same url in development and in production.
     // Not all requests are json, obviously. However, I'm not sure, I should care here.
-    // `application/octet-stream` would be the canonical 'generic data' MIME type
+    // `application/octet-stream` would be the canonical 'generic data' MIME type.
     req.setRequestHeader("Accept", "application/json");
 
     req.onload = function () {
@@ -70,16 +70,14 @@ type Message = {
 const TIME_1MIN = 60000;
 
 function MessageCpt(): ReactElement | null {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [password, setPassword] = useState<string | null>(
+    window.localStorage.getItem("calendarsaurus:password")
+  );
+  const [encrypted, setEncrypted] = useState<string>();
 
   useEffect(() => {
     async function doRequest() {
-      // js: `<script defer="defer" src="/calendarsaurus-wrecks/static/js/main.39124231.js">`
-      // %PUBLIC_URL% -> /calendarsaurus-wrecks
-      const encrypted = await httpGet<string>("messages-encrypted.txt");
-      // todo password to be entered instead
-      const bytes = AES.decrypt(encrypted, "secret key 123");
-      setMessages(JSON.parse(bytes.toString(enc.Utf8)).data); // JSON standard allows the toplevel to be only objects
+      return httpGet<string>("messages-encrypted.txt").then(setEncrypted);
     }
 
     doRequest().catch(alert);
@@ -88,8 +86,33 @@ function MessageCpt(): ReactElement | null {
     return () => clearInterval(id);
   }, []);
 
-  const today = dayjs().format("YYYY-MM-DD");
-  const message = messages.find((m) => m.date === today);
+  if (!encrypted) return null;
+
+  const passwordInput = (
+    <input
+      onChange={(e) => {
+        setPassword(e.target.value);
+      }}
+    />
+  );
+
+  if (!password) {
+    return passwordInput;
+  }
+
+  let message;
+  try {
+    const bytes = AES.decrypt(encrypted, password);
+    const messages = JSON.parse(bytes.toString(enc.Utf8)).data as Message[]; // JSON standard allows the toplevel to be only objects
+
+    window.localStorage.setItem("calendarsaurus:password", password);
+
+    const today = dayjs().format("YYYY-MM-DD");
+    message = messages.find((m) => m.date === today);
+  } catch (e) {
+    console.error("wrong password");
+    return passwordInput;
+  }
 
   return message ? <div className={"today-info"}>{message.message}</div> : null;
 }
