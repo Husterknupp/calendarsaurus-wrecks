@@ -2,6 +2,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import LOCALE_DE from "dayjs/locale/de";
+import { AES, enc } from "crypto-js";
 
 function App() {
   return (
@@ -53,31 +54,37 @@ async function httpGet<T>(url: string): Promise<T> {
     req.send();
   });
 }
-//
-// type Message = {
-//   date: string; // 2023-05-11
-//   message: string;
-// };
+
+type Message = {
+  date: string; // 2023-05-11
+  message: string;
+};
 
 const TIME_1MIN = 60000;
 
 function MessageCpt(): ReactElement | null {
-  const [messages, setMessages] = useState<string>();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    function doRequest() {
-      httpGet<string>("messages-encrypted.txt").then(setMessages).catch(alert);
+    async function doRequest() {
+      // js: `<script defer="defer" src="/calendarsaurus-wrecks/static/js/main.39124231.js">`
+      // %PUBLIC_URL% -> /calendarsaurus-wrecks
+      const encrypted = await httpGet<string>("messages-encrypted.txt");
+      // todo password to be entered instead
+      const bytes = AES.decrypt(encrypted, "secret key 123");
+      setMessages(JSON.parse(bytes.toString(enc.Utf8)).data); // JSON standard allows the toplevel to be only objects
     }
 
-    doRequest();
+    doRequest().catch(alert);
 
     const id = setInterval(doRequest, TIME_1MIN);
     return () => clearInterval(id);
   }, []);
 
-  return messages ? (
-    <div className={"today-info"}>{messages?.slice(0, 23) + "..."}</div>
-  ) : null;
+  const today = dayjs().format("YYYY-MM-DD");
+  const message = messages.find((m) => m.date === today);
+
+  return message ? <div className={"today-info"}>{message.message}</div> : null;
 }
 
 export default App;
