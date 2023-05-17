@@ -44,6 +44,13 @@ async function httpGet<T>(url: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const req = new XMLHttpRequest();
     req.open("GET", url);
+
+    // Default Accept header value is `text/html` and the proxy doesn't forward those requests (see https://create-react-app.dev/docs/proxying-api-requests-in-development/)
+    // That is a problem because I can't use the same url in development and in production
+    // Not all requests are json, obviously. However, I'm not sure, I should care here.
+    // `application/octet-stream` would be the canonical 'generic data' MIME type
+    req.setRequestHeader("Accept", "application/json");
+
     req.onload = function () {
       if (this.status.toString().startsWith("2")) {
         resolve(this.response);
