@@ -74,13 +74,19 @@ function MessageCpt(): ReactElement | null {
     window.localStorage.getItem("calendarsaurus:password")
   );
   const [encrypted, setEncrypted] = useState<string>();
+  const [today, setToday] = useState(dayjs());
 
   useEffect(() => {
-    async function doRequest() {
-      return httpGet<string>("messages-encrypted.txt").then(setEncrypted);
+    function doRequest() {
+      try {
+        setToday(dayjs());
+        httpGet<string>("messages-encrypted.txt").then(setEncrypted);
+      } catch (e) {
+        alert(e);
+      }
     }
 
-    doRequest().catch(alert);
+    doRequest();
 
     const id = setInterval(doRequest, TIME_1MIN);
     return () => clearInterval(id);
@@ -107,14 +113,20 @@ function MessageCpt(): ReactElement | null {
 
     window.localStorage.setItem("calendarsaurus:password", password);
 
-    const today = dayjs().format("YYYY-MM-DD");
-    message = messages.find((m) => m.date === today);
+    message = messages.find((m) => m.date === today.format("YYYY-MM-DD"));
   } catch (e) {
     console.error("wrong password");
     return passwordInput;
   }
 
-  return message ? <div className={"today-info"}>{message.message}</div> : null;
+  return (
+    <>
+      {message ? <div className={"today-info"}>{message.message}</div> : null}
+      <small className={"debug-info"}>
+        Gerendert um {dayjs().format("HH:mm:ss")}
+      </small>
+    </>
+  );
 }
 
 export default App;
