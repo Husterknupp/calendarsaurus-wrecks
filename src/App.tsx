@@ -106,6 +106,7 @@ function MessageCpt(): ReactElement | null {
     return passwordInput;
   }
 
+  // todo allow multi messages
   let message;
   try {
     const bytes = AES.decrypt(encrypted, password);
