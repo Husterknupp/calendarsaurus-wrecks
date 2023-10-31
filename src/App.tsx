@@ -77,7 +77,7 @@ function MessageCpt(): ReactElement | null {
   const [today, setToday] = useState(dayjs());
 
   useEffect(() => {
-    function doRequest() {
+    function refreshMessages() {
       try {
         setToday(dayjs());
         httpGet<string>("messages-encrypted.txt").then(setEncrypted);
@@ -86,9 +86,9 @@ function MessageCpt(): ReactElement | null {
       }
     }
 
-    doRequest();
+    refreshMessages();
 
-    const id = setInterval(doRequest, TIME_1MIN);
+    const id = setInterval(refreshMessages, TIME_1MIN);
     return () => clearInterval(id);
   }, []);
 
@@ -106,7 +106,7 @@ function MessageCpt(): ReactElement | null {
     return passwordInput;
   }
 
-  // todo allow multi messages
+  // todo allow multi-line messages
   let message;
   try {
     const bytes = AES.decrypt(encrypted, password);
